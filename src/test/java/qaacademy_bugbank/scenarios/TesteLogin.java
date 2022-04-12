@@ -10,50 +10,60 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import qaacademy_bugbank.page.HomePage;
+import qaacademy_bugbank.page.LoginPage;
 
-public class TesteCadastro {
+public class TesteLogin {
 
     WebDriver driver;
     HomePage homePage;
+    LoginPage loginPage;
+
+    String email = "teste17@teste.com";
+    String senha = "teste123";
 
     @Before
     public void setupBrowser() {
         driver = new ChromeDriver();
         homePage = new HomePage(driver);
+        loginPage = new LoginPage(driver);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.manage().window().maximize();
         driver.get("http://localhost:3000/");
-
+        cadastrarUsuario();
     }
 
     @Test
-    public void testePositivoCadastro() {
+    public void testeLoginComSucesso() {
+        loginPage.preencherEmail(email);
+        loginPage.preencherSenha(senha);
+        loginPage.clicarAcessar();
+        validarMensagem("bem vindo ao BugBank :)");
+        validarUrl("/home");
+    }
+
+    public void cadastrarUsuario() {
         homePage.clicarRegistrar();
-        homePage.preencherEmail("teste1@gmail.com");
+        homePage.preencherEmail(email);
         homePage.preencherNome("QA Academy");
-        homePage.preencherSenha("teste123");
-        homePage.preencherConfirmacaoSenha("teste123");
+        homePage.preencherSenha(senha);
+        homePage.preencherConfirmacaoSenha(senha);
         homePage.clicarEmCriarComSaldo();
         homePage.clicarCadastrar();
         validarMensagem("foi criada com sucesso");
-    }
-
-    @Test
-    public void testeCadastroVazio() {
-        homePage.clicarRegistrar();
-        homePage.clicarCadastrar();
-        validarMensagem("Nome não pode ser vazio");
-    }
-
+        homePage.clicarBotaoFechar();
+    }    
 
     public void validarMensagem(String msg) {
         Assert.assertTrue(driver.getPageSource().contains(msg));
     }
+    public void validarUrl(String pagina) {
+        Assert.assertTrue(driver.getCurrentUrl().contains(pagina));
+    }
 
-    @After
+/*    @After
     public void finalizarBrowser() throws InterruptedException {
         Thread.sleep(2000);
         driver.quit();
     }
-
+*/
 }
